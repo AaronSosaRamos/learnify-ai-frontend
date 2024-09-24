@@ -2,8 +2,8 @@ import { FaBookOpen, FaClipboardCheck, FaShieldAlt, FaTasks } from 'react-icons/
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300 ease-in-out">
-      <div className="container mx-auto py-10 px-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 transition-colors duration-300 ease-in-out">
+      <div className="container mx-auto px-6 py-10">
         <h1 className="text-5xl font-bold text-center text-gray-800 dark:text-gray-200 mb-8 transition-colors duration-300 animate-pulse">
           Learnify AI 📘✨
         </h1>
