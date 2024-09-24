@@ -1,5 +1,5 @@
 import { FaBookOpen, FaClipboardCheck, FaShieldAlt, FaTasks } from 'react-icons/fa';
-import Link from 'next/link'; // Ensure you import Link from next/link
+import Link from 'next/link'; 
 
 export default function Home() {
     return (
