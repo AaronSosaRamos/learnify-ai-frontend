@@ -1,13 +1,12 @@
 "use client"
 
+import Layout from "@/components/Layout";
 import MainScreen from "@/components/MainScreen";
-import Navbar from "@/components/Navbar";
 
 export default function Home() {
   return (
-    <>
-    <Navbar />
-    <MainScreen />
-    </>
+    <Layout>
+      <MainScreen />
+    </Layout>
   );
 }
