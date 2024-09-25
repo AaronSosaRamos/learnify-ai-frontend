@@ -1,68 +1,35 @@
-import React, { useState, Suspense } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaFileAlt, FaSchool, FaCloudUploadAlt } from "react-icons/fa";
-import { RiFileUploadLine, RiFileTextLine, RiTranslate } from "react-icons/ri";
-import ResultCard from "./ResultCard";
+import { FaSchool, FaFileAlt } from "react-icons/fa";
+import { RiFileUploadLine, RiTranslate } from "react-icons/ri";
 import Spinner from "../Spinner";
 
-const fetchResultData = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        topic: 'Introduction to Data Science',
-        grade_level: 'college',
-        ideas: [
-          {
-            assignment_description:
-              'Develop a neural network architecture for emulating a specific Data Science workflow...',
-            explanation:
-              'This modification makes the assignment AI-resistant because it requires students...'
-          },
-          {
-            assignment_description:
-              'Design a neural network architecture for emulating a Data Science workflow...',
-            explanation:
-              'This modification makes the assignment AI-resistant by requiring students to work with...'
-          },
-          {
-            assignment_description:
-              'Develop a neural network architecture for emulating a Data Science workflow...',
-            explanation:
-              'This modification makes the assignment AI-resistant by requiring students to design...'
-          }
-        ]
-      });
-    }, 2000); 
-  });
-};
-
 const formSchema = z.object({
-  topic: z.string().min(1).max(255, { message: "Topic must be between 1 and 255 characters 🎯" }),
-  assignment: z.string().min(1).max(255, { message: "Assignment must be between 1 and 255 characters 📝" }),
-  grade_level: z.enum(["elementary", "middle", "high", "college", "professional"]),
+  grade_level: z.string().min(1, { message: "Grade level is required 🎓" }),
+  task_description: z.string().min(1, { message: "Task description is required 📝" }),
+  students_description: z.string().min(1, { message: "Students description is required 👩‍🎓" }),
+  file_url: z.string().url({ message: "Must be a valid URL 🌐" }),
   file_type: z.enum(
     [
       "pdf", "csv", "txt", "md", "url", "pptx", "docx", "xls", "xlsx", "xml", "gdoc", "gsheet", "gslide", "gpdf", "img", "youtube_url"
     ],
     { message: "Please select a valid file type 📂" }
   ),
-  file_url: z.string().url({ message: "Must be a valid URL 🌐" }),
   lang: z.enum(["en", "es", "fr", "de", "it", "zh", "jp"], { message: "Please select a valid language 🌍" }),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-const AIResistantForm = () => {
+const ConnectWithThemForm = () => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   });
 
   const [loading, setLoading] = useState(false);
-  const [resultData, setResultData] = useState<any>(null);
 
   const onSubmit = async (data: FormData) => {
     toast.success("Form submitted successfully! 🎉", {
@@ -72,63 +39,74 @@ const AIResistantForm = () => {
     });
 
     setLoading(true);
-    const result = await fetchResultData();
-    setResultData(result);
-    setLoading(false);
-    reset();
+
+    setTimeout(() => {
+      console.log(data);
+      setLoading(false);
+      reset();
+    }, 2000);
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 transition-all duration-300">
+    <div className="min-h-screen flex flex-col justify-center items-center py-16 bg-gradient-to-b from-purple-500 via-indigo-500 to-teal-500 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 transition-all duration-300">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-md p-8 bg-white dark:bg-gray-900 shadow-md rounded-lg space-y-6 animate__animated animate__fadeInUp transition-all duration-300"
       >
         <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
-          AI-Resistant Assignments ✨
+          Personalized Tasks Form ✨
         </h1>
-
-        <div>
-          <label className="block mb-1 text-gray-700 dark:text-gray-300">Topic 🎯</label>
-          <div className="flex items-center">
-            <FaFileAlt className="mr-2 text-gray-600 dark:text-gray-400" />
-            <input
-              {...register("topic")}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-gray-800 dark:text-white rounded-md transition-all duration-300"
-              placeholder="Enter the topic"
-            />
-          </div>
-          {errors.topic && <span className="text-red-500 text-sm">{errors.topic.message}</span>}
-        </div>
-
-        <div>
-          <label className="block mb-1 text-gray-700 dark:text-gray-300">Assignment 📝</label>
-          <div className="flex items-center">
-            <RiFileTextLine className="mr-2 text-gray-600 dark:text-gray-400" />
-            <input
-              {...register("assignment")}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-gray-800 dark:text-white rounded-md transition-all duration-300"
-              placeholder="Enter the assignment"
-            />
-          </div>
-          {errors.assignment && <span className="text-red-500 text-sm">{errors.assignment.message}</span>}
-        </div>
 
         <div>
           <label className="block mb-1 text-gray-700 dark:text-gray-300">Grade Level 🎓</label>
           <div className="flex items-center">
             <FaSchool className="mr-2 text-gray-600 dark:text-gray-400" />
-            <select
+            <input
               {...register("grade_level")}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-gray-800 dark:text-white rounded-md transition-all duration-300"
-            >
-              <option value="elementary">Elementary</option>
-              <option value="middle">Middle</option>
-              <option value="high">High</option>
-              <option value="college">College</option>
-              <option value="professional">Professional</option>
-            </select>
+              placeholder="Enter the grade level"
+            />
           </div>
+          {errors.grade_level && <span className="text-red-500 text-sm">{errors.grade_level.message}</span>}
+        </div>
+
+        <div>
+          <label className="block mb-1 text-gray-700 dark:text-gray-300">Task Description 📝</label>
+          <div className="flex items-center">
+            <RiFileUploadLine className="mr-2 text-gray-600 dark:text-gray-400" />
+            <textarea
+              {...register("task_description")}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-gray-800 dark:text-white rounded-md transition-all duration-300"
+              placeholder="Describe the task"
+            />
+          </div>
+          {errors.task_description && <span className="text-red-500 text-sm">{errors.task_description.message}</span>}
+        </div>
+
+        <div>
+          <label className="block mb-1 text-gray-700 dark:text-gray-300">Students Description 👩‍🎓</label>
+          <div className="flex items-center">
+            <FaFileAlt className="mr-2 text-gray-600 dark:text-gray-400" />
+            <textarea
+              {...register("students_description")}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-gray-800 dark:text-white rounded-md transition-all duration-300"
+              placeholder="Describe the students"
+            />
+          </div>
+          {errors.students_description && <span className="text-red-500 text-sm">{errors.students_description.message}</span>}
+        </div>
+
+        <div>
+          <label className="block mb-1 text-gray-700 dark:text-gray-300">File URL 🌐</label>
+          <div className="flex items-center">
+            <FaFileAlt className="mr-2 text-gray-600 dark:text-gray-400" />
+            <input
+              {...register("file_url")}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-gray-800 dark:text-white rounded-md transition-all duration-300"
+              placeholder="Enter the file URL"
+            />
+          </div>
+          {errors.file_url && <span className="text-red-500 text-sm">{errors.file_url.message}</span>}
         </div>
 
         <div>
@@ -161,19 +139,6 @@ const AIResistantForm = () => {
         </div>
 
         <div>
-          <label className="block mb-1 text-gray-700 dark:text-gray-300">File URL 🌐</label>
-          <div className="flex items-center">
-            <FaCloudUploadAlt className="mr-2 text-gray-600 dark:text-gray-400" />
-            <input
-              {...register("file_url")}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-gray-800 dark:text-white rounded-md transition-all duration-300"
-              placeholder="Enter the file URL"
-            />
-          </div>
-          {errors.file_url && <span className="text-red-500 text-sm">{errors.file_url.message}</span>}
-        </div>
-
-        <div>
           <label className="block mb-1 text-gray-700 dark:text-gray-300">Language 🌍</label>
           <div className="flex items-center">
             <RiTranslate className="mr-2 text-gray-600 dark:text-gray-400" />
@@ -196,7 +161,7 @@ const AIResistantForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 px-4 ${loading ? 'bg-gray-400' : 'bg-gradient-to-r from-green-400 via-blue-400 to-purple-500'} text-white rounded-md hover:from-green-500 hover:via-blue-500 hover:to-purple-600 dark:bg-gradient-to-r dark:from-gray-600 dark:via-gray-500 dark:to-gray-400 transition-all duration-300`}
+          className={`w-full py-2 px-4 ${loading ? 'bg-gray-400' : 'bg-gradient-to-r from-yellow-400 via-pink-500 to-red-500'} text-white rounded-md hover:from-yellow-500 hover:via-pink-600 hover:to-red-600 dark:bg-gradient-to-r dark:from-gray-600 dark:via-gray-500 dark:to-gray-400 transition-all duration-300`}
         >
           {loading ? "Submitting..." : "Submit 🚀"}
         </button>
@@ -205,14 +170,8 @@ const AIResistantForm = () => {
       <ToastContainer />
 
       {loading && <Spinner />}
-      
-      {!loading && resultData && (
-        <Suspense fallback={<Spinner />}>
-          <ResultCard data={resultData} />
-        </Suspense>
-      )}
     </div>
   );
 };
 
-export default AIResistantForm;
+export default ConnectWithThemForm;
