@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,29 +7,84 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaSchool, FaFileAlt } from "react-icons/fa";
 import { RiFileUploadLine, RiTranslate } from "react-icons/ri";
 import Spinner from "../Spinner";
+import Recommendations from "./Recommendations";
 
-const formSchema = z.object({
-  grade_level: z.string().min(1, { message: "Grade level is required 🎓" }),
-  task_description: z.string().min(1, { message: "Task description is required 📝" }),
-  students_description: z.string().min(1, { message: "Students description is required 👩‍🎓" }),
-  file_url: z.string().url({ message: "Must be a valid URL 🌐" }),
-  file_type: z.enum(
-    [
-      "pdf", "csv", "txt", "md", "url", "pptx", "docx", "xls", "xlsx", "xml", "gdoc", "gsheet", "gslide", "gpdf", "img", "youtube_url"
-    ],
-    { message: "Please select a valid file type 📂" }
-  ),
-  lang: z.enum(["en", "es", "fr", "de", "it", "zh", "jp"], { message: "Please select a valid language 🌍" }),
-});
+const fetchRecommendations = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        recommendations: [
+          {
+            project_overview:
+              "Design and train a neural network to predict the popularity of songs on a music streaming platform...",
+            rationale:
+              "This project aligns with students' interest in hands-on activities and their diverse cultural backgrounds...",
+            difficulty_level: "Moderate",
+            required_tools: [
+              "Python",
+              "TensorFlow or PyTorch",
+              "Jupyter Notebook",
+              "Music streaming platform API or data scraping tools",
+            ],
+            estimated_time: "2-3 weeks",
+          },
+          {
+            project_overview:
+              "Develop a neural network model to analyze and classify images of local landmarks in your city...",
+            rationale:
+              "This project encourages students to explore their urban environment and apply their knowledge of neural networks...",
+            difficulty_level: "Moderate to Challenging",
+            required_tools: [
+              "Python",
+              "TensorFlow or PyTorch",
+              "Keras",
+              "Image processing libraries like OpenCV",
+            ],
+            estimated_time: "3-4 weeks",
+          },
+          {
+            project_overview:
+              "Create a gamified learning experience using a neural network to teach students about different cultural traditions...",
+            rationale:
+              "This project leverages the power of gamified learning to engage students in a fun and interactive way...",
+            difficulty_level: "Challenging",
+            required_tools: [
+              "Python",
+              "TensorFlow or PyTorch",
+              "Unity or other game development framework",
+              "Game design tools",
+            ],
+            estimated_time: "4-6 weeks",
+          },
+        ],
+      });
+    }, 2000); 
+  });
+};
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = {
+  grade_level: string;
+  task_description: string;
+  students_description: string;
+  file_url: string;
+  file_type: string;
+  lang: string;
+};
 
 const ConnectWithThemForm = () => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(z.object({
+      grade_level: z.string().min(1, { message: "Grade level is required 🎓" }),
+      task_description: z.string().min(1, { message: "Task description is required 📝" }),
+      students_description: z.string().min(1, { message: "Students description is required 👩‍🎓" }),
+      file_url: z.string().url({ message: "Must be a valid URL 🌐" }),
+      file_type: z.enum(["pdf", "csv", "txt", "md", "url", "pptx", "docx", "xls", "xlsx", "xml", "gdoc", "gsheet", "gslide", "gpdf", "img", "youtube_url"], { message: "Please select a valid file type 📂" }),
+      lang: z.enum(["en", "es", "fr", "de", "it", "zh", "jp"], { message: "Please select a valid language 🌍" }),
+    })),
   });
 
   const [loading, setLoading] = useState(false);
+  const [resultData, setResultData] = useState<any>(null);
 
   const onSubmit = async (data: FormData) => {
     toast.success("Form submitted successfully! 🎉", {
@@ -40,11 +95,10 @@ const ConnectWithThemForm = () => {
 
     setLoading(true);
 
-    setTimeout(() => {
-      console.log(data);
-      setLoading(false);
-      reset();
-    }, 2000);
+    const recommendations = await fetchRecommendations();
+    setResultData(recommendations);
+    setLoading(false);
+    reset();
   };
 
   return (
@@ -67,7 +121,7 @@ const ConnectWithThemForm = () => {
               placeholder="Enter the grade level"
             />
           </div>
-          {errors.grade_level && <span className="text-red-500 text-sm">{errors.grade_level.message}</span>}
+          {errors.grade_level && <span className="text-red-500 text-sm">{errors.grade_level?.message}</span>}
         </div>
 
         <div>
@@ -80,7 +134,7 @@ const ConnectWithThemForm = () => {
               placeholder="Describe the task"
             />
           </div>
-          {errors.task_description && <span className="text-red-500 text-sm">{errors.task_description.message}</span>}
+          {errors.task_description && <span className="text-red-500 text-sm">{errors.task_description?.message}</span>}
         </div>
 
         <div>
@@ -93,7 +147,7 @@ const ConnectWithThemForm = () => {
               placeholder="Describe the students"
             />
           </div>
-          {errors.students_description && <span className="text-red-500 text-sm">{errors.students_description.message}</span>}
+          {errors.students_description && <span className="text-red-500 text-sm">{errors.students_description?.message}</span>}
         </div>
 
         <div>
@@ -106,7 +160,7 @@ const ConnectWithThemForm = () => {
               placeholder="Enter the file URL"
             />
           </div>
-          {errors.file_url && <span className="text-red-500 text-sm">{errors.file_url.message}</span>}
+          {errors.file_url && <span className="text-red-500 text-sm">{errors.file_url?.message}</span>}
         </div>
 
         <div>
@@ -135,7 +189,7 @@ const ConnectWithThemForm = () => {
               <option value="youtube_url">YouTube URL</option>
             </select>
           </div>
-          {errors.file_type && <span className="text-red-500 text-sm">{errors.file_type.message}</span>}
+          {errors.file_type && <span className="text-red-500 text-sm">{errors.file_type?.message}</span>}
         </div>
 
         <div>
@@ -155,7 +209,7 @@ const ConnectWithThemForm = () => {
               <option value="jp">Japanese</option>
             </select>
           </div>
-          {errors.lang && <span className="text-red-500 text-sm">{errors.lang.message}</span>}
+          {errors.lang && <span className="text-red-500 text-sm">{errors.lang?.message}</span>}
         </div>
 
         <button
@@ -170,6 +224,12 @@ const ConnectWithThemForm = () => {
       <ToastContainer />
 
       {loading && <Spinner />}
+
+      {!loading && resultData && (
+        <Suspense fallback={<Spinner />}>
+          <Recommendations data={resultData} />
+        </Suspense>
+      )}
     </div>
   );
 };
