@@ -3,7 +3,7 @@
 import Layout from "@/components/Layout";
 import SyllabusGeneratorForm from "@/components/syllabus_generator/SyllabusGeneratorForm";
 
-export default function Home() {
+export default function SyllabusGenerator() {
   return (
     <Layout>
       <SyllabusGeneratorForm />

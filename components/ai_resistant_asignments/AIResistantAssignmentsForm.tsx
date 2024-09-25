@@ -85,7 +85,7 @@ const AIResistantForm = () => {
         className="w-full max-w-md p-8 bg-white dark:bg-gray-900 shadow-md rounded-lg space-y-6 animate__animated animate__fadeInUp transition-all duration-300"
       >
         <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
-          AI-Resistant Form ✨
+          AI-Resistant Assignments ✨
         </h1>
 
         <div>
