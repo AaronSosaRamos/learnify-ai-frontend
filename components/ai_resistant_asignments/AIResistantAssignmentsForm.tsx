@@ -8,37 +8,7 @@ import { FaFileAlt, FaSchool, FaCloudUploadAlt } from "react-icons/fa";
 import { RiFileUploadLine, RiFileTextLine, RiTranslate } from "react-icons/ri";
 import ResultCard from "./ResultCard";
 import Spinner from "../Spinner";
-
-const fetchResultData = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        topic: 'Introduction to Data Science',
-        grade_level: 'college',
-        ideas: [
-          {
-            assignment_description:
-              'Develop a neural network architecture for emulating a specific Data Science workflow...',
-            explanation:
-              'This modification makes the assignment AI-resistant because it requires students...'
-          },
-          {
-            assignment_description:
-              'Design a neural network architecture for emulating a Data Science workflow...',
-            explanation:
-              'This modification makes the assignment AI-resistant by requiring students to work with...'
-          },
-          {
-            assignment_description:
-              'Develop a neural network architecture for emulating a Data Science workflow...',
-            explanation:
-              'This modification makes the assignment AI-resistant by requiring students to design...'
-          }
-        ]
-      });
-    }, 2000); 
-  });
-};
+import axios from "axios";
 
 const formSchema = z.object({
   topic: z.string().min(1).max(255, { message: "Topic must be between 1 and 255 characters 🎯" }),
@@ -65,17 +35,30 @@ const AIResistantForm = () => {
   const [resultData, setResultData] = useState<any>(null);
 
   const onSubmit = async (data: FormData) => {
-    toast.success("Form submitted successfully! 🎉", {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-    });
-
+    setResultData(null);
     setLoading(true);
-    const result = await fetchResultData();
-    setResultData(result);
-    setLoading(false);
-    reset();
+
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/ai-resistant-assignments`, data, {
+        headers: {
+          'api-key': process.env.NEXT_PUBLIC_API_KEY,
+        },
+      });
+
+      toast.success("Form submitted successfully! 🎉", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+      });
+
+      setResultData(response.data);
+    } catch (error) {
+      toast.error("Error generating AI-resistant assignment ❌");
+      console.error("Error generating assignment:", error);
+    } finally {
+      setLoading(false);
+      reset();
+    }
   };
 
   return (
@@ -205,7 +188,7 @@ const AIResistantForm = () => {
       <ToastContainer />
 
       {loading && <Spinner />}
-      
+
       {!loading && resultData && (
         <Suspense fallback={<Spinner />}>
           <ResultCard data={resultData} />
