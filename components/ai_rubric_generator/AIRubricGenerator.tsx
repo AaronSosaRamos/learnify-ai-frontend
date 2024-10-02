@@ -7,13 +7,15 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaSchool, FaFileAlt, FaRulerHorizontal } from "react-icons/fa";
 import { RiFileUploadLine, RiTranslate } from "react-icons/ri";
 import Spinner from "../Spinner";
+import axios from "axios";
+import RubricCard from "./Rubric";
 
 const formSchema = z.object({
   grade_level: z.string().min(1, { message: "Grade level is required 🎓" }),
   point_scale: z.string().min(1, { message: "Point scale is required 🔢" }),
   standard: z.string().min(1, { message: "Standard is required 📜" }),
   file_url: z.string().url({ message: "Must be a valid URL 🌐" }),
-  file_type: z.enum(
+  file_type: z.enum( 
     [
       "pdf", "csv", "txt", "md", "url", "pptx", "docx", "xls", "xlsx", "xml", "gdoc", "gsheet", "gslide", "gpdf", "img", "youtube_url"
     ],
@@ -30,21 +32,33 @@ const AIRubricGeneratorForm = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [rubricData, setRubricData] = useState<any | null>(null); 
 
   const onSubmit = async (data: FormData) => {
-    toast.success("Form submitted successfully! 🎉", {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-    });
-
+    setRubricData(null);
     setLoading(true);
 
-    setTimeout(() => {
-      console.log(data);
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/ai-rubric-generator`, data, {
+        headers: {
+          'api-key': process.env.NEXT_PUBLIC_API_KEY,
+        },
+      });
+
+      toast.success("Form submitted successfully! 🎉", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+      });
+      
+      setRubricData(response.data);  
+    } catch (error) {
+      toast.error("Error generating rubric ❌");
+      console.error("Error generating rubric:", error);
+    } finally {
       setLoading(false);
       reset();
-    }, 2000); 
+    }
   };
 
   return (
@@ -171,6 +185,12 @@ const AIRubricGeneratorForm = () => {
       <ToastContainer />
 
       {loading && <Spinner />}
+
+      {rubricData && (
+        <div className="mt-10 w-full max-w-4xl">
+          <RubricCard data={rubricData} />
+        </div>
+      )}
     </div>
   );
 };
